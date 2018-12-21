@@ -12,8 +12,7 @@ struct figure
     int colour;
     string type;
     char contraction;
-    //bool firstMove;
-};//pawn, rook, knight, bishop, queen, king, empty;
+};
 
 string player(string one, string two, bool turn);
 

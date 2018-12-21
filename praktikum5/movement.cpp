@@ -1,5 +1,6 @@
 #include <iostream>
 #include <aufgabe1h.h>
+#include <check.h>
 
 using namespace std;
 
@@ -33,18 +34,16 @@ void movePiece(figure board[8][8], string position)
 
 bool movePawn(string position, bool turn, figure board[8][8])
 {
-    bool occupied;
-
     //move from
     int iFrom = getRow(position);
-    int jFrom = getCol(position) - '0';
+    int jFrom = getCol(position);
 
     //string where to move
     string positionTo = to(position);
 
     //moveTo
     int iTo = getRow(positionTo);
-    int jTo = getCol(positionTo) - '0';
+    int jTo = getCol(positionTo);
 
     //direction
     int direction = 0;
@@ -116,6 +115,21 @@ bool movePawn(string position, bool turn, figure board[8][8])
 
 bool moveKnight(string position, figure board[8][8])
 {
+    //move from
+    int iFrom = getRow(position);
+    int jFrom = getCol(position);
+
+    //string where to move
+    string positionTo = to(position);
+
+    //moveTo
+    int iTo = getRow(positionTo);
+    int jTo = getCol(positionTo);
+
+    if((abs(jFrom-jTo)==2 && abs(iFrom-iTo)==1) || (abs(iFrom-iTo)==2 && abs(jFrom-jTo)==1))
+    {
+        return true;
+    }
     return false;
 }
 
@@ -126,9 +140,7 @@ bool moveRook(string position, figure board[8][8])
     int jFrom = getCol(position) - '0';
 
     //string where to move
-    string positionTo;
-    positionTo = position.substr( position.length() - 2 );
-    cout << positionTo << endl;
+    string positionTo = to(position);
 
     //moveTo
     int iTo = getRow(positionTo);
@@ -180,9 +192,7 @@ bool moveBishop(string position, figure board[8][8])
     int jFrom = getCol(position);
 
     //string where to move
-    string positionTo;
-    positionTo = position.substr( position.length() - 2 );
-    cout << positionTo << endl;
+    string positionTo = to(position);
 
     //moveTo
     int iTo = getRow(positionTo);
@@ -199,7 +209,13 @@ bool moveBishop(string position, figure board[8][8])
     {
         dir2 = -1;
     }
-    //for(int i = 1; i < abs(jFrom - ))
+
+    //not diagonal?
+    if(iFrom == iTo || jFrom == jTo)
+    {
+        return false;
+    }
+
 
     //diagonal move up right
     for(int x = 1,y = 1; x < (8 - jFrom) && y < (8 - iFrom); x++, y++)
@@ -248,9 +264,7 @@ bool moveQueen(string position, figure board[8][8])
     int jFrom = getCol(position);
 
     //string where to move
-    string positionTo;
-    positionTo = position.substr( position.length() - 2 );
-    cout << positionTo << endl;
+    string positionTo = to(position);
 
     //moveTo
     int iTo = getRow(positionTo);
@@ -268,29 +282,32 @@ bool moveQueen(string position, figure board[8][8])
     return false;
 }
 
-bool moveKing(string position, figure board[8][8])
+bool moveKing(string position, figure board[8][8], bool turn)
 {
     //move from
     int iFrom = getRow(position);
     int jFrom = getCol(position);
 
     //string where to move
-    string positionTo;
-    positionTo = position.substr( position.length() - 2 );
-    cout << positionTo << endl;
+    string positionTo = to(position);
 
     //moveTo
     int iTo = getRow(positionTo);
     int jTo = getCol(positionTo);
 
-    //test if the attemptet move is possible
-    if (jFrom + 1 == jTo || iFrom + 1 == iTo || jFrom - 1 == jTo || iFrom - 1 == iTo)
-    {
-        cout << "the king moves to the right" << endl;
-        return true;
-    }
-    cout << "the king does not move, enter another move" << endl;
-    return false;
+    if(not((abs(jFrom-jTo) <= 1) && (abs(iFrom-iTo) <= 1))) return false;
+       //prüfen ob er im schach wäre
+       //to lazy, do move on copied board and run schach()
+       figure chess[8][8];
+       for(int i=0;i<8;i++)
+       {
+           memcpy(chess[i], board[i],sizeof (board[i]));
+       }
+
+       chess[jTo][iTo] = chess[jFrom][iFrom];
+       chess[jFrom][iFrom] = {9, "", '-'};
+
+       return (!check(chess, turn));
 }
 
 bool checkMove(string position, figure piece, bool turn, figure board[8][8])
@@ -298,7 +315,7 @@ bool checkMove(string position, figure piece, bool turn, figure board[8][8])
     //letzten character der Ausgabe des Arraywerts an Position x für Spielbrett y
     switch (piece.contraction) {
     case 'D': return moveQueen(position, board);
-    case 'K': return moveKing(position, board);
+    case 'K': return moveKing(position, board, turn);
     case 'L': return moveBishop(position, board);
     case 'S': return moveKnight(position, board);
     case 'T': return moveRook(position, board);
