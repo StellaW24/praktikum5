@@ -199,7 +199,7 @@ bool inputCheck(string position, bool turn, figure board[8][8]) //piece als zus√
                     if(position.at(position.size() - 1) == '1' || position.at(position.size() - 1) == '2' || position.at(position.size() - 1) == '3' || position.at(position.size() - 1) == '4' || position.at(position.size() - 1) == '5' || position.at(position.size() - 1) == '6' || position.at(position.size() - 1) == '7'|| position.at(position.size() - 1) == '8')
                     {
                         //check if you move your piece and do not hurt your own
-                        if((turn && piece.colour == 0 && (to(position)).front() == 'w')||(!turn && piece.colour == 1 && (to(position)).front() == 's'))
+                        if((turn && piece.colour == 0 && (char)(from(getPiece(position, board)).front()) == 'w')||(!turn && piece.colour == 1 && (char)(from(getPiece(position, board)).front()) == 's'))
                         {
                             if(checkMove(position, piece, turn, board))
                             {

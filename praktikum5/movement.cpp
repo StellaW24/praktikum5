@@ -83,6 +83,10 @@ bool movePawn(string position, bool turn, figure board[8][8])
                 {
                     return false;
                 }
+                else
+                {
+                    return true;
+                }
             }
         }
         //move lesss than one step?
@@ -98,6 +102,10 @@ bool movePawn(string position, bool turn, figure board[8][8])
             {
                 return false;
             }
+            else
+            {
+                return true;
+            }
         }
     }
     //attacking another figure?
@@ -110,10 +118,13 @@ bool movePawn(string position, bool turn, figure board[8][8])
     {
         return false;
     }
-    return true;
+    else
+    {
+        return true;
+    }
 }
 
-bool moveKnight(string position, figure board[8][8])
+bool moveKnight(string position)
 {
     //move from
     int iFrom = getRow(position);
@@ -137,51 +148,34 @@ bool moveRook(string position, figure board[8][8])
 {
     //move from
     int iFrom = getRow(position);
-    int jFrom = getCol(position) - '0';
+    int jFrom = getCol(position);
 
     //string where to move
     string positionTo = to(position);
 
     //moveTo
     int iTo = getRow(positionTo);
-    int jTo = getCol(positionTo) - '0';
+    int jTo = getCol(positionTo);
 
-    //row move positive
-    for(int x = 1; x < (8 - jFrom); x++)
-    {
-        if (x == jTo && iTo == iFrom)
-        {
-            cout << "the queen moves to the right" << endl;
-            return true;
-        }
+
+    //up and down
+    if(jFrom == jTo){
+        for(int i = min(iFrom,iTo) + 1; i < max(iFrom,iTo); i++){
+            if(board[jFrom][i].colour != 0){
+                return false;
+            }
+        }return true;
     }
-    //row move negative
-    for(int x = jFrom; x >= 0; x--)
-    {
-        if (x == jTo && iTo == iFrom)
-        {
-            cout << "the queen moves to the left" << endl;
-            return true;
-        }
+
+    //left and right
+    if(iFrom==iTo){
+        for(int i = min(jFrom,jTo) + 1; i < max(jFrom,jTo); i++){
+            if(board[i][iFrom].colour != 0){
+                return false;
+            }
+        }return true;
     }
-    //column move positive
-    for(int y = 1; y < (8 - iFrom); y++)
-    {
-        if (y == iTo && jTo == jFrom)
-        {
-            cout << "the queen moves upward" << endl;
-            return true;
-        }
-    }
-    //column move negative
-    for(int y = iFrom; y >= 0; y--)
-    {
-        if (y == iTo && jTo == jFrom)
-        {
-            cout << "the queen moves downward" << endl;
-            return true;
-        }
-    }
+
     return false;
 }
 
@@ -215,62 +209,21 @@ bool moveBishop(string position, figure board[8][8])
     {
         return false;
     }
-
-
-    //diagonal move up right
-    for(int x = 1,y = 1; x < (8 - jFrom) && y < (8 - iFrom); x++, y++)
+    else
     {
-        if (x == jTo && y == iTo)
-        {
-            cout << "the bishop moves upward to the right" << endl;
-            return true;
+        for(int i=1; i < abs(jFrom-jTo); i++){
+            if(board[i * dir1 + jFrom][i*dir2 + iFrom].colour != 0)
+            {
+                cout << "zug blockiert bei: " << i*dir1 + jFrom << ":" << i*dir2 + iFrom << endl;
+                return false;
+            }
         }
+        return true;
     }
-    //diagonal move down left
-    for(int x = jFrom,y = iFrom; x >= 0 && y >= 0; x--, y--)
-    {
-        if (x == jTo && y == iTo)
-        {
-            cout << "the bishop moves downward to the left" << endl;
-            return true;
-        }
-    }
-    //diagonal move up left
-    for(int x = jFrom,y = 1; x >= 0 && y < (8 - iFrom); x--, y++)
-    {
-        if (x == jTo && y == iTo)
-        {
-            cout << "the bishop moves upward to the left" << endl;
-            return true;
-        }
-    }
-    //diagonal move down right
-    for(int x = 1,y = iFrom; x < (8 - jFrom) && y >= 0; x++, y--)
-    {
-        if (x == jTo && y == iTo)
-        {
-            cout << "the bishop moves downward to the right" << endl;
-            return true;
-        }
-    }
-
-    return false;
 }
 
 bool moveQueen(string position, figure board[8][8])
 {
-    //move from
-    int iFrom = getRow(position);
-    int jFrom = getCol(position);
-
-    //string where to move
-    string positionTo = to(position);
-
-    //moveTo
-    int iTo = getRow(positionTo);
-    int jTo = getCol(positionTo);
-
-    //test if the attemptet move is possible
     if(moveBishop(position, board))
     {
         return true;
@@ -312,12 +265,12 @@ bool moveKing(string position, figure board[8][8], bool turn)
 
 bool checkMove(string position, figure piece, bool turn, figure board[8][8])
 {
-    //letzten character der Ausgabe des Arraywerts an Position x für Spielbrett y
+    //letzten character der Ausgabe des boardaywerts an Position x für Spielbrett y
     switch (piece.contraction) {
     case 'D': return moveQueen(position, board);
     case 'K': return moveKing(position, board, turn);
     case 'L': return moveBishop(position, board);
-    case 'S': return moveKnight(position, board);
+    case 'S': return moveKnight(position);
     case 'T': return moveRook(position, board);
     case 'B': return movePawn(position, turn, board);
     case '-': cout << "Leere Felder enthalten keine bewegbaren Figuren." << endl; break;
